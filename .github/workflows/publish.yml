@@ -3,9 +3,10 @@ name: publish-pypi
 # 发布到 PyPI。两种可选认证方式：
 #   A) Trusted Publishing（推荐）：在 https://pypi.org/manage/account/publishing/ 为
 #      仓库 q1z2q3-debug/sanjiu-apk-builder 绑定本 workflow（publish-pypi.yml），
-#      发布者选择 GitHub Actions。无需存密码/token。
+#      发布者选择 GitHub Actions。无需存密码/token。绑定后请把下方
+#      "if: env.PYPI_TOKEN != ''" 改为 "if: always()" 以放开 trusted publishing。
 #   B) PYPI_TOKEN：在仓库 Secrets 配置 `PYPI_TOKEN`（值为 PyPI __token__ 密码），
-#      本 workflow 会自动读取。
+#      本 workflow 会自动读取并发布。
 
 on:
   push:
@@ -31,8 +32,15 @@ jobs:
           python -m build
 
       - name: Publish to PyPI
+        if: env.PYPI_TOKEN != ''
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         uses: pypa/gh-action-pypi-publish@release
         with:
           packages-dir: dist/
-          # 若用方式 B，配置 PYPI_TOKEN secret 后由 action 自动使用；
-          # 未配置则回退 trusted publishing。
+
+      - name: Skip publish notice
+        if: env.PYPI_TOKEN == ''
+        run: |
+          echo "未配置 PYPI_TOKEN secret，跳过自动发布。"
+          echo "可选：在仓库 Secrets 配置 PYPI_TOKEN，或在 PyPI 绑定 Trusted Publishing 并把本发布步骤 if 改为 always()。"
