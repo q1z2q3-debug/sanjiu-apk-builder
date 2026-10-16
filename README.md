@@ -26,10 +26,11 @@ pip install sanjiu-apk-builder
 ## 用法
 
 ```bash
-# 1) 从模板生成工程（可选 --poems/--original 指定你自己的语料 JSON）
+# 1) 从模板生成工程（可选 --poems/--original/--icon）
 sanjiu-apk scaffold --out ./my-poem-app \
     --package com.myname.poetry --name "我的诗库" \
-    --poems poems.json --original original.json
+    --poems poems.json --original original.json \
+    --icon my_icon.png        # 自定义 App 图标（自动生成 5 密度 mipmap）
 
 # 2) 构建（自动检测 JDK17 与 SDK，缺则用 --jdk/--sdk 指定）
 sanjiu-apk build --dir ./my-poem-app \
@@ -37,6 +38,8 @@ sanjiu-apk build --dir ./my-poem-app \
 ```
 
 构建产物：`app/build/outputs/apk/release/app-release.apk`（release 签名，`apksigner` 校验通过）。
+
+> 不传 `--icon` 时使用内置的九爻卦画默认图标；传了则用你的图片（居中裁剪正方形后缩放为 48/72/96/144/192 px）。
 
 ## 发布到 PyPI
 

@@ -4,11 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sanjiu-apk-builder"
-version = "0.1.0"
+version = "0.1.1"
 description = "一键生成三元九维诗词分类 APK 的开源脚手架 + 构建器"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.8"
+dependencies = ["Pillow>=9"]
 keywords = ["android", "apk", "scaffold", "sanjiu", "triple-nine", "poetry"]
 
 [project.scripts]

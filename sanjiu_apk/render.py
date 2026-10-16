@@ -2,9 +2,32 @@
 import os
 import shutil
 
+from PIL import Image
+
 _TEMPLATES = os.path.join(os.path.dirname(__file__), "templates")
 
 _TEXT_EXT = {".gradle", ".xml", ".properties", ".json", ".md", ".txt", ".bat"}
+
+# Android launcher 图标密度
+_MIPMAP_SIZES = {
+    "mipmap-mdpi": 48,
+    "mipmap-hdpi": 72,
+    "mipmap-xhdpi": 96,
+    "mipmap-xxhdpi": 144,
+    "mipmap-xxxhdpi": 192,
+}
+
+
+def _generate_icons(src, res_dir):
+    """用自定义图片生成各密度 launcher 图标（居中裁剪正方形 + LANCZOS 缩放）。"""
+    img = Image.open(src).convert("RGBA")
+    w, h = img.size
+    s = min(w, h)
+    img = img.crop(((w - s) // 2, (h - s) // 2, (w - s) // 2 + s, (h - s) // 2 + s))
+    for folder, px in _MIPMAP_SIZES.items():
+        dpath = os.path.join(res_dir, folder)
+        os.makedirs(dpath, exist_ok=True)
+        img.resize((px, px), Image.LANCZOS).save(os.path.join(dpath, "ic_launcher.png"))
 
 
 def _rendered(text, package, app_name, project_name):
@@ -39,8 +62,12 @@ def _copy_tree(src_dir, dst_dir, package, app_name, project_name):
 
 
 def scaffold(out, package="com.sanjiu.apk", app_name="三元九维诗词",
-             project_name="SanjiuPoem", poems=None, original=None):
-    """从模板生成工程到 out 目录。poems/original 为用户提供的语料 JSON，可选。"""
+             project_name="SanjiuPoem", poems=None, original=None, icon=None):
+    """从模板生成工程到 out 目录。
+
+    poems/original 为用户提供的语料 JSON（可选）；icon 为自定义 App 图标图片路径（可选，
+    提供时自动生成 5 密度 mipmap 覆盖默认九爻卦画图标）。
+    """
     out = os.path.abspath(out)
     if os.path.exists(out) and os.listdir(out):
         raise SystemExit(f"目标目录非空，拒绝覆盖: {out}")
@@ -82,7 +109,10 @@ def scaffold(out, package="com.sanjiu.apk", app_name="三元九维诗词",
               os.path.join(_TEMPLATES, name)
         shutil.copy(src, os.path.join(assets, name))
 
-    # 图标
-    _copy_tree(os.path.join(_TEMPLATES, "res"), os.path.join(main, "res"),
+    # 图标（默认模板；若提供 --icon 则用自定义图片生成各密度）
+    res_dir = os.path.join(main, "res")
+    _copy_tree(os.path.join(_TEMPLATES, "res"), res_dir,
                package, app_name, project_name)
+    if icon:
+        _generate_icons(icon, res_dir)
     return out
