@@ -38,6 +38,14 @@ sanjiu-apk build --dir ./my-poem-app \
 
 构建产物：`app/build/outputs/apk/release/app-release.apk`（release 签名，`apksigner` 校验通过）。
 
+## 发布到 PyPI
+
+- 已发布：[PyPI · sanjiu-apk-builder](https://pypi.org/project/sanjiu-apk-builder/)（`pip install sanjiu-apk-builder`）
+- 打 `v*` 标签自动触发 [publish-pypi.yml](.github/workflows/publish.yml) 发布：
+  - **Trusted Publishing（推荐）**：在 [PyPI 项目设置](https://pypi.org/manage/account/publishing/) 把仓库 `q1z2q3-debug/sanjiu-apk-builder` 与 `publish-pypi.yml` 绑定为发布者，无需存密码；
+  - 或配置仓库 Secrets `PYPI_TOKEN`（PyPI `__token__` 密码）。
+- CI [build-apk](.github/workflows/build.yml) 保证每次提交可构建出签名 APK；Release 由 [release.yml](.github/workflows/release.yml) 在打标签时自动创建并附 APK。
+
 ## 前置要求
 
 - **JDK 17**（AGP 8.9 要求），经 `JAVA_HOME` 或 `--jdk` 提供
