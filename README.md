@@ -1,0 +1,54 @@
+# sanjiu-apk-builder
+
+一键生成**三元九维诗词分类 APK** 的开源脚手架 + 构建器。把"制作 APK"的整套方法（Android 工程脚手架、三元诗卦引擎、图文界面、图标接入、JDK17/SDK 检测、签名 keystore、release 构建、APK 校验）沉淀为一条命令。
+
+## 功能
+
+- **scaffold**：从内置模板生成完整可运行的 Android 工程
+  - 三元诗卦引擎 `SanjiuEngine`（9 维诗卦 + 错/综/互/变算子 + 年龄段分类 + 逆向检索）
+  - 图文并茂界面 `MainActivity`（卦象图画、年龄段 chip、三元推演、经典/原创双模式）
+  - 九爻卦画 App 图标（5 密度 mipmap）+ 语料资源
+- **build**：自动检测 JDK17 / Android SDK，生成签名 `release.jks`，跑 `assembleRelease`，`apksigner` 校验，产出签名 APK
+- 数据驱动：`poems.json`（经典语料）+ `original.json`（三元原创）可直接替换
+
+## 安装
+
+```bash
+pip install sanjiu-apk-builder
+# 或本地：pip install -e .
+```
+
+## 用法
+
+```bash
+# 1) 从模板生成工程（可选 --poems/--original 指定你自己的语料 JSON）
+sanjiu-apk scaffold --out ./my-poem-app \
+    --package com.myname.poetry --name "我的诗库" \
+    --poems poems.json --original original.json
+
+# 2) 构建（自动检测 JDK17 与 SDK，缺则用 --jdk/--sdk 指定）
+sanjiu-apk build --dir ./my-poem-app \
+    --jdk /path/to/jdk-17 --sdk /path/to/android-sdk
+```
+
+构建产物：`app/build/outputs/apk/release/app-release.apk`（release 签名，`apksigner` 校验通过）。
+
+## 前置要求
+
+- **JDK 17**（AGP 8.9 要求），经 `JAVA_HOME` 或 `--jdk` 提供
+- **Android SDK**（含 `cmdline-tools`、`build-tools`、`platforms/android-36`、`licenses`），经 `ANDROID_HOME` 或 `--sdk` 提供
+
+## 语料格式
+
+`poems.json`：`[{"title","author","text","topic","age","gua":[9 维]}]`
+`original.json`：`[{"age","op","gua","title","text","oracle"}]`
+
+`age` 用数字索引：0=儿童 1=少年 2=青年 3=中年 4=老年。示例见 `templates/poems.json`。
+
+## 安全说明
+
+插件自动生成的 keystore 与密码仅用于本地 demo 构建；发布正式应用请自行更换 keystore 与强密码，且勿把 `keystore/`、`gradle.properties`、`local.properties` 提交进仓库（见模板 `.gitignore` 思路）。
+
+## License
+
+MIT
