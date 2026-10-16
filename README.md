@@ -2,6 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![CI build-apk](https://github.com/q1z2q3-debug/sanjiu-apk-builder/actions/workflows/build.yml/badge.svg)](https://github.com/q1z2q3-debug/sanjiu-apk-builder/actions/workflows/build.yml)
+[![PyPI version](https://img.shields.io/pypi/v/sanjiu-apk-builder.svg)](https://pypi.org/project/sanjiu-apk-builder/)
+[![PyPI - Python](https://img.shields.io/pypi/pyversions/sanjiu-apk-builder.svg)](https://pypi.org/project/sanjiu-apk-builder/)
 
 一键生成**三元九维诗词分类 APK** 的开源脚手架 + 构建器。把"制作 APK"的整套方法（Android 工程脚手架、三元诗卦引擎、图文界面、图标接入、JDK17/SDK 检测、签名 keystore、release 构建、APK 校验）沉淀为一条命令。
 
