@@ -62,11 +62,15 @@ def _copy_tree(src_dir, dst_dir, package, app_name, project_name):
 
 
 def scaffold(out, package="com.sanjiu.apk", app_name="三元九维诗词",
-             project_name="SanjiuPoem", poems=None, original=None, icon=None):
+             project_name="SanjiuPoem", poems=None, original=None, icon=None,
+             mode="poem", html=None):
     """从模板生成工程到 out 目录。
 
-    poems/original 为用户提供的语料 JSON（可选）；icon 为自定义 App 图标图片路径（可选，
-    提供时自动生成 5 密度 mipmap 覆盖默认九爻卦画图标）。
+    poems/original 为用户提供的语料 JSON（可选，仅 poem 模式）；icon 为自定义 App 图标
+    图片路径（可选，提供时自动生成 5 密度 mipmap 覆盖默认九爻卦画图标）。
+    mode="poem" 生成三元诗词 APK；mode="web" 生成 WebView 全屏加载 assets/index.html
+    的 APK（任意自包含 HTML，如三元九维认知引擎）。html 为 web 模式下页面路径（可选，
+    缺省用模板内置）。
     """
     out = os.path.abspath(out)
     if os.path.exists(out) and os.listdir(out):
@@ -96,18 +100,27 @@ def scaffold(out, package="com.sanjiu.apk", app_name="三元九维诗词",
     # Java 源码按包路径落位
     java_dst = os.path.join(main, "java", package.replace(".", "/"))
     os.makedirs(java_dst, exist_ok=True)
-    for jf in ("SanjiuEngine.java", "MainActivity.java"):
-        _copy_render(os.path.join(_TEMPLATES, "app/src/main/java", jf),
-                     os.path.join(java_dst, jf), package, app_name, project_name)
+    if mode == "web":
+        _copy_render(os.path.join(_TEMPLATES, "web/MainActivity.java"),
+                     os.path.join(java_dst, "MainActivity.java"),
+                     package, app_name, project_name)
+    else:
+        for jf in ("SanjiuEngine.java", "MainActivity.java"):
+            _copy_render(os.path.join(_TEMPLATES, "app/src/main/java", jf),
+                         os.path.join(java_dst, jf), package, app_name, project_name)
 
-    # 语料资源
+    # 资源
     assets = os.path.join(main, "assets")
     os.makedirs(assets, exist_ok=True)
-    for name in ("poems.json", "original.json"):
-        src = poems if (name == "poems.json" and poems) else \
-              original if (name == "original.json" and original) else \
-              os.path.join(_TEMPLATES, name)
-        shutil.copy(src, os.path.join(assets, name))
+    if mode == "web":
+        src = html or os.path.join(_TEMPLATES, "web/index.html")
+        shutil.copy(src, os.path.join(assets, "index.html"))
+    else:
+        for name in ("poems.json", "original.json"):
+            src = poems if (name == "poems.json" and poems) else \
+                  original if (name == "original.json" and original) else \
+                  os.path.join(_TEMPLATES, name)
+            shutil.copy(src, os.path.join(assets, name))
 
     # 图标（默认模板；若提供 --icon 则用自定义图片生成各密度）
     res_dir = os.path.join(main, "res")

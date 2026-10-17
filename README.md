@@ -14,6 +14,7 @@
   - 图文并茂界面 `MainActivity`（卦象图画、年龄段 chip、三元推演、经典/原创双模式）
   - 九爻卦画 App 图标（5 密度 mipmap）+ 语料资源
 - **build**：自动检测 JDK17 / Android SDK，生成签名 `release.jks`，跑 `assembleRelease`，`apksigner` 校验，产出签名 APK
+- **web 模式**（`--mode web`）：任意自包含 HTML（三元九维认知引擎等）一键打包成 WebView APK，`assets/index.html` 全屏加载，支持 JS / 返回键
 - 数据驱动：`poems.json`（经典语料）+ `original.json`（三元原创）可直接替换
 
 ## 安装
@@ -24,6 +25,15 @@ pip install sanjiu-apk-builder
 ```
 
 ## 用法
+
+```bash
+# 认知引擎等网页 → APK（WebView 模式）
+sanjiu-apk scaffold --out ./cog-app --mode web \
+    --package com.sanjiu.cog --name "三元九维·认知引擎" \
+    --html cognitive-engine.html
+sanjiu-apk build --dir ./cog-app --jdk <JDK17> --sdk <ANDROID_SDK>
+```
+
 
 ```bash
 # 1) 从模板生成工程（可选 --poems/--original/--icon）

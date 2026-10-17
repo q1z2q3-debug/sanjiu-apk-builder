@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三元九维 · 认知引擎</title>
+<style>
+  :root{--paper:#f6f1e7;--ink:#2b2b2b;--ink2:#5a5147;--ink3:#8a8177;--cinnabar:#b03a2e;
+        --line:#c9bfae;--card:#fffdf7;--gold:#a97b2f;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Songti SC","STSong","Noto Serif SC","PingFang SC","Microsoft YaHei",serif;min-height:100vh}
+  .wrap{max-width:860px;margin:0 auto;padding:22px 18px 60px}
+  header{text-align:center;padding:18px 0 10px;border-bottom:2px solid var(--ink)}
+  header h1{font-size:26px;letter-spacing:8px;font-weight:700}
+  header .en{font-size:11px;color:var(--ink3);letter-spacing:3px;margin-top:6px}
+  header .sub{font-size:13px;color:var(--ink2);margin-top:4px}
+  .seal{display:inline-block;border:2px solid var(--cinnabar);color:var(--cinnabar);
+        padding:2px 8px;font-size:13px;letter-spacing:2px;margin-top:8px;transform:rotate(-1deg)}
+  /* 输入区 */
+  .input-card{background:var(--card);border:1px solid var(--line);border-radius:6px;
+        padding:18px;margin-top:20px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+  .input-card label{font-size:13px;color:var(--ink2);display:block;margin-bottom:8px;letter-spacing:1px}
+  textarea{width:100%;min-height:64px;border:1px solid var(--line);border-radius:4px;
+        background:#fffdf6;padding:10px;font-size:15px;color:var(--ink);
+        font-family:inherit;resize:vertical;line-height:1.6}
+  textarea:focus{outline:none;border-color:var(--ink2)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+  .chip{border:1px solid var(--line);border-radius:14px;padding:3px 10px;font-size:12px;
+        color:var(--ink2);cursor:pointer;background:#fffdf6;transition:.15s}
+  .chip:hover{background:#efe7d6;color:var(--cinnabar);border-color:var(--cinnabar)}
+  .btn-row{display:flex;justify-content:center;margin-top:6px}
+  button.btn{background:var(--ink);color:#f6f1e7;border:none;border-radius:4px;padding:10px 34px;
+        font-size:15px;letter-spacing:3px;cursor:pointer;font-family:inherit;transition:.15s}
+  button.btn:hover{background:var(--cinnabar)}
+  /* 结果 */
+  .result{display:none;margin-top:22px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:16px;
+        margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+  .card h3{font-size:14px;color:var(--ink);letter-spacing:2px;margin-bottom:10px;
+        border-left:3px solid var(--cinnabar);padding-left:8px}
+  .card h3 small{color:var(--ink3);letter-spacing:0;margin-left:6px;font-weight:400}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:640px){.grid2{grid-template-columns:1fr}}
+  /* 爻画 */
+  .yao-box{display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 0}
+  .yao{width:150px;height:12px;display:flex;justify-content:center;align-items:center}
+  .yao .b{height:12px;background:var(--ink);border-radius:1px}
+  .yang .b{width:72px;flex:none}          /* 阳：两半紧邻=一条实线 */
+  .yin .b{width:60px;flex:none}           /* 阴：两半断开=一段虚线 */
+  .yin{gap:20px}
+  .zhong .b{width:30px;height:3px;margin-top:4px;background:var(--ink3);flex:none} /* 中：细点线 */
+  .zhong{gap:9px}
+  /* 定位头 */
+  .loc-head{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+  .loc-idx{font-size:12px;color:var(--ink3);letter-spacing:1px}
+  .ming{font-size:22px;font-weight:700;letter-spacing:2px;color:var(--ink)}
+  .tend{display:inline-block;background:var(--ink);color:#f6f1e7;padding:3px 12px;border-radius:3px;
+        font-size:13px;letter-spacing:1px;margin-top:8px}
+  .tend2{color:var(--cinnabar);font-size:13px;margin-top:6px}
+  .advice{background:#f3ead8;border-left:4px solid var(--gold);padding:12px 14px;border-radius:4px;
+        font-size:15px;line-height:1.7;color:var(--ink)}
+  .advice b{color:var(--cinnabar)}
+  /* 五域 */
+  .domains{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .dom{border:1px solid var(--line);border-radius:5px;padding:10px 12px;background:#fffdf6}
+  .dom .dname{font-size:12px;font-weight:700;letter-spacing:1px;color:var(--cinnabar);
+        border-bottom:1px dotted var(--line);padding-bottom:4px;margin-bottom:6px}
+  .dom .dtext{font-size:12.5px;line-height:1.65;color:var(--ink2)}
+  /* 卦典 */
+  .oracle .om{font-size:17px;font-weight:700;letter-spacing:1px}
+  .oracle .oq{color:var(--cinnabar);font-size:13px;margin:6px 0}
+  .oracle .os{font-size:13px;line-height:1.8;color:var(--ink2)}
+  /* 邻近 */
+  .nb{display:flex;gap:8px;flex-wrap:wrap}
+  .nb .n{background:#fffdf6;border:1px solid var(--line);border-radius:4px;padding:6px 10px;
+        font-size:12px;color:var(--ink2)}
+  .nb .n b{color:var(--ink)}
+  .vec-bar{display:flex;gap:6px;justify-content:center;margin-top:8px}
+  .vcell{width:26px;height:26px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+        border:1px solid var(--line);border-radius:3px;font-size:10px;color:var(--ink3)}
+  .vcell .vv{font-size:14px;font-weight:700;color:var(--ink)}
+  .vcell.vp .vv{color:var(--cinnabar)} .vcell.vn .vv{color:#2f5a8a}
+  .foot{text-align:center;color:var(--ink3);font-size:11px;margin-top:24px;letter-spacing:1px}
+  .loading{text-align:center;color:var(--ink3);font-size:12px;padding:20px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>三元九维 · 认知引擎</h1>
+    <div class="en">SANJIU · COGNITIVE ENGINE · 19683 SPACE</div>
+    <div class="sub">把处境写进 3⁹ 认知坐标 · 定位 · 多语言解读 · 泛化决策</div>
+    <div class="seal">观象知机 · 明理趋吉</div>
+  </header>
+
+  <div class="input-card">
+    <label>描述你此刻的处境（一句话即可）</label>
+    <textarea id="q" placeholder="例：产品已成熟，市场向好，时机成熟，宜大力投放"></textarea>
+    <div class="chips" id="chips"></div>
+    <div class="btn-row"><button class="btn" onclick="run()">推 演</button></div>
+  </div>
+
+  <div class="result" id="result"></div>
+  <div class="foot">sanjiu-core · 5域语义桥 · 深度卦典 · 19683 认知坐标</div>
+</div>
+
+<script>
+/* ================= 认知引擎（JS 移植，自包含） ================= */
+var N=19683, TH=0.2;
+
+/* 词表：9 维（上→下），加权 */
+var LEX=[
+ {pos:[["显",1.5],["达成",1.5],["上位",1.2],["向外",1.2],["盛",1.5],["成熟",1.3],["明达",1.3]],
+  neg:[["隐",1.5],["潜藏",1.3],["退",1.2],["收敛",1.2],["衰",1.5],["暗晦",1.3]]},
+ {pos:[["生发",1.5],["增益",1.5],["主导",1.2],["动",0.8],["扩张",1.5],["增长",1.3],["推进",1.2]],
+  neg:[["减损",1.5],["被动",1.3],["静",0.9],["亏损",1.5],["消耗",1.2]]},
+ {pos:[["居间",1.3],["耦合",1.3],["过渡",1.2],["中",0.5],["协调",1.3],["均衡",1.3]],
+  neg:[["偏",1.2],["极端",1.3],["失衡",1.5],["震荡",1.4],["争夺",1.4]]},
+ {pos:[["主动",1.4],["进",0.8],["张",1.2],["攻",1.3],["投放",1.4],["出击",1.4]],
+  neg:[["缩",1.3],["雌",1.2],["守",1.0],["退",1.2],["观望",1.3],["避险",1.4]]},
+ {pos:[["势能",1.4],["平衡",1.2],["稳",1.0],["蓄",1.3],["稳固",1.4],["积淀",1.3],["耐心",1.2]],
+  neg:[["不稳",1.4],["倾",1.3],["泄",1.3],["剧烈",1.5],["单薄",1.4],["冒进",1.4]]},
+ {pos:[["生",1.2],["长",1.2],["升",1.3],["阳",1.2],["向好",1.5],["上升",1.4]],
+  neg:[["衰",1.5],["降",1.3],["阴",1.2],["疲劳",1.4],["亏",1.3]]},
+ {pos:[["通",1.3],["交",1.2],["联",1.3],["化",0.8],["协调",1.3],["人心",1.4],["和解",1.4]],
+  neg:[["隔",1.4],["滞",1.4],["塞",1.4],["争执",1.5],["不齐",1.4],["决裂",1.5]]},
+ {pos:[["明",1.4],["显于外",1.3],["成",1.0],["盈利",1.4],["达成",1.3]],
+  neg:[["晦",1.4],["藏于内",1.3],["败",1.4],["未成",1.2]]},
+ {pos:[["下位",1.3],["根基",1.4],["本",1.0],["内",0.6],["实",1.2],["积累",1.3],["沉淀",1.3]],
+  neg:[["末",1.2],["枝",1.2],["外",0.8],["虚",1.2],["单薄",1.4]]}
+];
+
+/* 全量卦缓存 idx→9维 */
+var CACHE=null;
+function cache(){ if(CACHE) return CACHE;
+  CACHE=new Int8Array(N*9);
+  for(var i=0;i<N;i++){var t=i;for(var k=0;k<9;k++){var d=t%3;
+    CACHE[i*9+(8-k)] = d===0?-1:(d===1?0:1); t=(t-d)/3;}}
+  return CACHE; }
+
+/* encode：加权语义打分 */
+function encode(text){
+  var v=[];
+  for(var i=0;i<9;i++){var s=0;
+    for(var a=0;a<LEX[i].pos.length;a++) if(text.indexOf(LEX[i].pos[a][0])>=0) s+=LEX[i].pos[a][1];
+    for(var b=0;b<LEX[i].neg.length;b++) if(text.indexOf(LEX[i].neg[b][0])>=0) s-=LEX[i].neg[b][1];
+    v.push(s>TH?1:(s<-TH?-1:0)); }
+  return v; }
+
+/* search：欧氏距离 Top-N */
+function search(vec,top){
+  var c=cache(),full=[],best=[];
+  for(var i=0;i<N;i++){var d=0;
+    for(var k=0;k<9;k++){var q=c[i*9+k]-vec[k]; d+=q*q;}
+    best.push([d,i]); }
+  best.sort(function(a,b){return a[0]-b[0]||a[1]-b[1];});
+  var out=[];
+  for(var t=0;t<Math.min(top||5,best.length);t++){
+    var idx=best[t][1],g=[];
+    for(var k=0;k<9;k++) g.push(c[idx*9+k]);
+    out.push({idx:idx,dist:Math.sqrt(best[t][0]),gua:g}); }
+  return out; }
+
+/* 结构倾向 */
+function fp(g){var pos=0,neg=0;
+  for(var k=0;k<9;k++){if(g[k]>0)pos++;else if(g[k]<0)neg++;}
+  var zero=9-pos-neg,bal=pos-neg,en=pos+neg,tend,ten;
+  if(zero>=5) tend="枢·待：中性居多，处枢纽过渡，宜静观";
+  else if(bal>=3&&en>=6) tend="显·进：阳气盛而贯通，宜主动推进";
+  else if(bal<=-3&&en>=6) tend="隐·守：阴气盛而收敛，宜守正待时";
+  else if(bal>=1) tend="偏显·渐：阳气略胜，可缓进勿躁";
+  else if(bal<=-1) tend="偏隐·渐守：阴气略胜，宜蓄力勿进";
+  else tend="衡·中：阴阳相持，宜居中权衡";
+  ten=(pos>=3&&neg>=3)?"张力高·阴阳并争":"张力低·势单一致";
+  return {pos:pos,neg:neg,zero:zero,bal:bal,tend:tend,ten:ten}; }
+
+/* 五域渲染 */
+var DIM={
+  drt:["承载","审定","增益"],
+  tiyong:["体","用","变","时","空","势","因","果","缘"],
+  luoshu:["坎水","坤土","震木","巽木","中土","乾金","兑金","艮土","离火"],
+  liuren:["本心","敏感度","动力","走向","势能","行动力","连接感","明暗","根基"],
+  heal:["体","用","变","时","空","势","因","果","缘"]
+};
+function lvl(s){
+  if(s>=2)return["盈·强","明·彻","丰·足"];
+  if(s===1)return["略盈·可任","略明·可察","略增·有余"];
+  if(s===0)return["中平·堪任","持衡·可判","平允·相称"];
+  if(s===-1)return["略亏·吃力","略晦·欠察","略耗·见绌"];
+  return["亏·难任","晦·难判","耗·虚损"];}
+function r_drt(v){var g=[lvl(v[0]+v[3]+v[6]),lvl(v[1]+v[4]+v[7]),lvl(v[2]+v[5]+v[8])];
+  return "承载"+g[0][0]+"；审定"+g[1][1]+"；增益"+g[2][2]+"。";}
+function t3(x){return x===1?"充盈":(x===-1?"不足":"中和");}
+function r_tiyong(v){
+  return "体"+t3(v[0])+"；用"+t3(v[1])+"；变"+(v[2]===1?"机现":v[2]===-1?"机塞":"候待")+
+    "；时"+(v[3]===1?"顺":v[3]===-1?"逆":"平")+"；"+(v[8]===1?"缘聚":v[8]===-1?"缘散":"缘平")+"。";}
+function r_luoshu(v){var w=[],l=[];
+  for(var i=0;i<9;i++){if(v[i]>0)w.push(DIM.luoshu[i]);else if(v[i]<0)l.push(DIM.luoshu[i]);}
+  var hub=v[4];
+  return "中宫"+(hub===1?"气旺·枢纽当行":hub===-1?"气敛·枢纽沉寂":"气枢·权衡待定")+
+    "；"+ (w.length?("气旺："+w.join("、")+"；"):"无气旺；")+
+    (l.length?("气敛："+l.join("、")+"。"):"无气敛。");}
+function phase(v){var p=0,n=0,z=0;
+  for(var k=0;k<9;k++){if(v[k]>0)p++;else if(v[k]<0)n++;else z++;}
+  if(z>6)return"悬置";if(p>5&&n<2)return"太阳";if(n>5&&p<2)return"太阴";
+  if(p>=3&&p<=5&&n<3)return"少阳";if(n>=3&&n<=5&&p<3)return"少阴";
+  if(p<3&&n<3&&z>5)return"平衡";return"参差";}
+function r_liuren(v){var ph=phase(v),g={"太阳":"速喜·吉快","少阳":"小吉·和合","太阴":"空亡·虚耗","少阴":"留连·缓滞","平衡":"大安·吉稳","悬置":"大安·观照","参差":"赤口·争阻"}[ph];
+  var f=[],l=[];for(var i=0;i<9;i++){if(v[i]>0)f.push(DIM.liuren[i]);else if(v[i]<0)l.push(DIM.liuren[i]);}
+  var tail=f.length&&l.length?("发："+f.join("、")+"；敛："+l.join("、")+"。"):f.length?("发："+f.join("、")+"。"):l.length?("敛："+l.join("、")+"。"):"。";
+  return ph+"之相，主"+g+"；"+tail;}
+function r_heal(v){var base=r_tiyong(v),xu=[],yn=[];
+  for(var i=0;i<9;i++){if(v[i]<0)xu.push(DIM.heal[i]);else if(v[i]>0)yn.push(DIM.heal[i]);}
+  return base+"需养补："+(xu.join("、")||"无")+"；可疏通："+(yn.join("、")||"无")+"。";}
+
+/* 位权映射：tiyong/heal 反向(域内0=core g8) */
+function toTiyong(vc){return [vc[8],vc[7],vc[6],vc[5],vc[4],vc[3],vc[2],vc[1],vc[0]];}
+
+/* 行动建议 */
+function advice(fp,ming){
+  var act;
+  if(fp.tend.indexOf("显·进")>=0)act="宜乘势主动推进，把握当机；同时控住节奏防过亢。";
+  else if(fp.tend.indexOf("隐·守")>=0)act="宜收敛守正、蓄力待时，止损聚气，勿逆势强攻。";
+  else if(fp.tend.indexOf("枢·待")>=0)act="宜静观权衡、谋定后动，机在枢纽未熟，勿躁进。";
+  else if(fp.tend.indexOf("偏显")>=0)act="宜缓进勿躁，边进边察，留有余地。";
+  else if(fp.tend.indexOf("偏隐")>=0)act="宜蓄力渐进，守中待变，勿轻启强争。";
+  else act="宜居中权衡，持衡而进。";
+  return act+"<b>（卦鉴："+ming+"）</b>"; }
+
+/* ================= 深度卦典（内置精简代表卦） ================= */
+var REPR=[{i:0,m:"阴·利贞·闭守止卦",q:"养晦蓄势，静待天时",s:"此卦下盘闭藏、蓄积、沉潜，重阴厚藏，宜静宜守；中道固守、沉静、阻滞，重阴厚藏，宜静宜守；上势收束、隐藏、敛聚，重阴厚藏，宜静宜守。阴重收敛，宜蓄不宜发，静以守成。",y:"阴"},{i:9841,m:"中·贞吉·察转度卦",q:"谋定后动，审时度势",s:"此卦下盘觉察、估量、观察，三衡相济，审于中正；中道转圜、中正、疏导，三衡相济，审于中正；上势权衡、审度、明辨，三衡相济，审于中正。审度居中，谋定后动，可免悔吝。",y:"中"},{i:19682,m:"阳·元亨·启动扬卦",q:"乘势而行，主动作为之时",s:"此卦下盘开启、生发、萌发，纯阳通泰，动而宜行；中道发动、昭明、通达，纯阳通泰，动而宜行；上势外扬、前行、接纳，纯阳通泰，动而宜行。阳动盛大，宜乘势而为，主动进取。",y:"阳"},{i:86,m:"阴·利贞·闭守止卦",q:"养晦蓄势，静待天时",s:"此卦下盘闭藏、估量、萌发，阴阳参差，动静相济；中道固守、中正、阻滞，阴阳参差，动静相济；上势收束、隐藏、敛聚，重阴厚藏，宜静宜守。阴重收敛，宜蓄不宜发，静以守成。",y:"阴"},{i:163,m:"阴·利贞·闭守止卦",q:"养晦蓄势，静待天时",s:"此卦下盘闭藏、蓄积、观察，阴阳参差，动静相济；中道固守、昭明、阻滞，阴厚阳微，守而后动；上势收束、隐藏、敛聚，重阴厚藏，宜静宜守。阴重收敛，宜蓄不宜发，静以守成。",y:"阴"},{i:8387,m:"阳·悔亡·察转度卦",q:"审时度势，谋定后动",s:"此卦下盘觉察、生发、萌发，阴阳参差，动静相济；中道转圜、中正、疏导，三衡相济，审于中正；上势权衡、隐藏、接纳，阴阳参差，动静相济。衡主其中，宜辨宜度，待机而动。",y:"阳"},{i:12797,m:"阳·元亨·启转度卦",q:"乘势而行，主动作为之时",s:"此卦下盘开启、生发、萌发，纯阳通泰，动而宜行；中道转圜、中正、通达，衡众居中，审时待机；上势权衡、前行、接纳，阴阳参差，动静相济。阳动盛大，宜乘势而为，主动进取。",y:"阳"},{i:11569,m:"阳·悔亡·察动度卦",q:"审时度势，谋定后动",s:"此卦下盘觉察、估量、观察，三衡相济，审于中正；中道发动、中正、通达，阴阳参差，动静相济；上势权衡、前行、敛聚，阴阳参差，动静相济。衡主其中，宜辨宜度，待机而动。",y:"阳"},{i:13000,m:"阳·贞吉·察动度卦",q:"谋定后动，审时度势",s:"此卦下盘觉察、估量、观察，三衡相济，审于中正；中道发动、中正、疏导，衡众居中，审时待机；上势权衡、前行、接纳，阴阳参差，动静相济。审度居中，谋定后动，可免悔吝。",y:"阳"},{i:16675,m:"阳·悔亡·察动扬卦",q:"审时度势，谋定后动",s:"此卦下盘觉察、生发、观察，衡众居中，审时待机；中道发动、中正、通达，阴阳参差，动静相济；上势外扬、审度、明辨，衡众居中，审时待机。衡主其中，宜辨宜度，待机而动。",y:"阳"},{i:8869,m:"阴·贞吉·察守度卦",q:"谋定后动，审时度势",s:"此卦下盘觉察、估量、观察，三衡相济，审于中正；中道固守、中正、疏导，衡众居中，审时待机；上势权衡、审度、敛聚，衡众居中，审时待机。审度居中，谋定后动，可免悔吝。",y:"阴"},{i:7627,m:"阴·贞吉·察转度卦",q:"谋定后动，审时度势",s:"此卦下盘觉察、估量、观察，三衡相济，审于中正；中道转圜、中正、阻滞，衡众居中，审时待机；上势权衡、隐藏、明辨，衡众居中，审时待机。审度居中，谋定后动，可免悔吝。",y:"阴"},{i:8788,m:"阴·贞吉·察守度卦",q:"谋定后动，审时度势",s:"此卦下盘觉察、估量、观察，三衡相济，审于中正；中道固守、沉静、疏导，阴阳参差，动静相济；上势权衡、审度、敛聚，衡众居中，审时待机。审度居中，谋定后动，可免悔吝。",y:"阴"},{i:12190,m:"阳·贞吉·察动度卦",q:"谋定后动，审时度势",s:"此卦下盘觉察、估量、观察，三衡相济，审于中正；中道发动、沉静、疏导，阴阳参差，动静相济；上势权衡、前行、明辨，衡众居中，审时待机。审度居中，谋定后动，可免悔吝。",y:"阳"},{i:12353,m:"阳·悔亡·察动度卦",q:"审时度势，谋定后动",s:"此卦下盘觉察、估量、萌发，衡众居中，审时待机；中道发动、昭明、疏导，阴阳参差，动静相济；上势权衡、前行、明辨，衡众居中，审时待机。衡主其中，宜辨宜度，待机而动。",y:"阳"},{i:1100,m:"阴·悔亡·启转止卦",q:"审时度势，谋定后动",s:"此卦下盘开启、蓄积、萌发，阳动阴承，行而有节；中道转圜、中正、疏导，三衡相济，审于中正；上势收束、隐藏、明辨，阴阳参差，动静相济。衡主其中，宜辨宜度，待机而动。",y:"阴"},{i:7000,m:"阴·悔亡·闭转度卦",q:"审时度势，谋定后动",s:"此卦下盘闭藏、生发、观察，阴阳参差，动静相济；中道转圜、昭明、疏导，衡众居中，审时待机；上势权衡、隐藏、敛聚，阴阳参差，动静相济。衡主其中，宜辨宜度，待机而动。",y:"阴"},{i:4000,m:"阴·贞吉·闭转止卦",q:"谋定后动，审时度势",s:"此卦下盘闭藏、估量、观察，衡众居中，审时待机；中道转圜、中正、疏导，三衡相济，审于中正；上势收束、审度、接纳，阴阳参差，动静相济。审度居中，谋定后动，可免悔吝。",y:"阴"},{i:14000,m:"阳·悔亡·察守扬卦",q:"审时度势，谋定后动",s:"此卦下盘觉察、估量、萌发，衡众居中，审时待机；中道固守、中正、通达，阴阳参差，动静相济；上势外扬、隐藏、明辨，阴阳参差，动静相济。衡主其中，宜辨宜度，待机而动。",y:"阳"},{i:17000,m:"阳·元亨·察守扬卦",q:"乘势而行，主动作为之时",s:"此卦下盘觉察、生发、萌发，阴阳参差，动静相济；中道固守、昭明、通达，阳动阴承，行而有节；上势外扬、审度、接纳，阴阳参差，动静相济。阳动盛大，宜乘势而为，主动进取。",y:"阳"},{i:5000,m:"阳·亨·闭动止卦",q:"顺势而行，戒骄戒躁",s:"此卦下盘闭藏、估量、萌发，阴阳参差，动静相济；中道发动、中正、通达，阴阳参差，动静相济；上势收束、前行、敛聚，阴厚阳微，守而后动。阳势为主，可行而忌急进。",y:"阳"},{i:9000,m:"阴·贞·察转度卦",q:"收敛固本，静观其变",s:"此卦下盘觉察、蓄积、沉潜，阴阳参差，动静相济；中道转圜、沉静、阻滞，阴阳参差，动静相济；上势权衡、审度、敛聚，衡众居中，审时待机。阴势为主，宜收宜藏，静以蓄力。",y:"阴"},{i:3605,m:"阳·悔亡·察动止卦",q:"审时度势，谋定后动",s:"此卦下盘觉察、估量、萌发，衡众居中，审时待机；中道发动、昭明、疏导，阴阳参差，动静相济；上势收束、审度、明辨，衡众居中，审时待机。衡主其中，宜辨宜度，待机而动。",y:"阳"},{i:10166,m:"阳·贞吉·察动度卦",q:"谋定后动，审时度势",s:"此卦下盘觉察、估量、萌发，衡众居中，审时待机；中道发动、昭明、疏导，阴阳参差，动静相济；上势权衡、审度、明辨，三衡相济，审于中正。审度居中，谋定后动，可免悔吝。",y:"阳"},{i:9926,m:"阳·贞吉·察转度卦",q:"谋定后动，审时度势",s:"此卦下盘觉察、生发、萌发，阴阳参差，动静相济；中道转圜、昭明、疏导，衡众居中，审时待机；上势权衡、审度、明辨，三衡相济，审于中正。审度居中，谋定后动，可免悔吝。",y:"阳"}];
+
+/* ================= UI ================= */
+var EXAMPLES=[
+ "产品已成熟，市场向好，时机成熟，宜大力投放",
+ "行情剧烈震荡，多空争夺，应观望避险，不宜重仓",
+ "项目胎死腹中，团队士气低落，但根基还在，宜收敛蓄力、守中待动",
+ "长期疲劳，气血亏损，需要静养调补，忌消耗",
+ "团队人心不齐，有人争执，需先协调关系再谈推进",
+ "起手资金有限，根基单薄，但想稳步扩张，不冒进"
+];
+(function(){var c=document.getElementById("chips");
+  EXAMPLES.forEach(function(e){var s=document.createElement("span");
+    s.className="chip";s.textContent=e.slice(0,14)+"…";
+    s.onclick=function(){document.getElementById("q").value=e;run();};
+    c.appendChild(s);});})();
+
+function yaoHtml(g){
+  var h='<div class="yao-box">';
+  for(var i=0;i<9;i++){var v=g[i];
+    if(v>0)h+='<div class="yao yang"><span class="b"></span><span class="b"></span></div>';
+    else if(v<0)h+='<div class="yao yin"><span class="b"></span><span class="b"></span></div>';
+    else h+='<div class="yao zhong"><span class="b"></span><span class="b"></span><span class="b"></span></div>';}
+  return h+'</div>';}
+
+function vecHtml(v){
+  var h='<div class="vec-bar">';
+  for(var i=0;i<9;i++){var s=v[i]>0?"+1":(v[i]<0?"−1":"0");
+    h+='<div class="vcell '+(v[i]>0?"vp":v[i]<0?"vn":"")+'"><div class="vv">'+s+'</div>上</div>';}
+  return h+"</div>";}
+
+function oracleHtml(idx){
+  var r=null;for(var i=0;i<REPR.length;i++)if(REPR[i].i===idx){r=REPR[i];break;}
+  if(r)return '<div class="om">'+r.m+'</div><div class="oq">'+r.q+'</div><div class="os">'+r.s+'…</div>';
+  return '<div class="om">卦 #'+idx+'</div><div class="oq">（完整卦典见 sanjiu_quanji_human）</div>';}
+
+function run(){
+  var text=document.getElementById("q").value.trim();
+  if(!text)return;
+  var v=encode(text),hits=search(v,3),top=hits[0],f=fp(top.gua);
+  var m=REPR.find?null:null;for(var i=0;i<REPR.length;i++)if(REPR[i].i===top.idx)m=REPR[i];
+  var ming=m?m.m:("卦 #"+top.idx);
+  var vt=toTiyong(top.gua);
+  var html='<div class="card"><h3>定位 · 认知坐标 <small>19683 空间</small></h3>'
+    +'<div class="grid2"><div>'+yaoHtml(top.gua)+'</div><div>'
+    +'<div class="loc-idx">编号 '+top.idx+' ｜ 距目标 0</div>'
+    +'<div class="ming">'+ming+'</div>'
+    +'<div class="tend">'+f.tend.split("：")[0]+'</div>'
+    +'<div class="tend2">'+f.tend+' ｜ '+f.ten+'</div>'
+    +vecHtml(v)+'</div></div></div>'
+    +'<div class="card"><h3>行动建议</h3><div class="advice">'+advice(f,ming)+'</div></div>'
+    +'<div class="card"><h3>五域同判 <small>同一坐标 · 多语言说同一件事</small></h3><div class="domains">'
+    +'<div class="dom"><div class="dname">D/R/T</div><div class="dtext">'+r_drt(top.gua)+'</div></div>'
+    +'<div class="dom"><div class="dname">体用变</div><div class="dtext">'+r_tiyong(vt)+'</div></div>'
+    +'<div class="dom"><div class="dname">洛书九宫</div><div class="dtext">'+r_luoshu(top.gua)+'</div></div>'
+    +'<div class="dom"><div class="dname">小六壬</div><div class="dtext">'+r_liuren(top.gua)+'</div></div>'
+    +'<div class="dom"><div class="dname">疗愈</div><div class="dtext">'+r_heal(vt)+'</div></div>'
+    +'</div></div>'
+    +'<div class="card oracle"><h3>卦典</h3>'+oracleHtml(top.idx)+'</div>'
+    +'<div class="card"><h3>邻近卦 <small>邻域泛化</small></h3><div class="nb">'
+    +hits.map(function(h){var mm=null;for(var j=0;j<REPR.length;j++)if(REPR[j].i===h.idx)mm=REPR[j];
+      return '<div class="n"><b>#'+h.idx+'</b> '+(mm?mm.m:"距"+h.dist.toFixed(2))+'</div>';}).join('')
+    +'</div></div>';
+  document.getElementById("result").innerHTML=html;
+  document.getElementById("result").style.display="block";
+  document.getElementById("result").scrollIntoView({behavior:"smooth"}); }
+</script>
+</body>
+</html>

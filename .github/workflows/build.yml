@@ -51,3 +51,20 @@ jobs:
           name: sanjiu-release-apk
           path: app-demo/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
+
+      - name: Scaffold cognitive-engine web APK
+        run: |
+          sanjiu-apk scaffold --out ./app-cog \
+            --package com.sanjiu.cog --name "三元九维·认知引擎" \
+            --project SanjiuCog --mode web \
+            --html examples/cognitive-engine/index.html
+
+      - name: Build cognitive-engine APK
+        run: sanjiu-apk build --dir ./app-cog
+
+      - name: Upload cognitive-engine APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: cognitive-engine-apk
+          path: app-cog/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error

@@ -9,9 +9,10 @@ from .builder import build
 
 def _cmd_scaffold(args):
     out = scaffold(args.out, args.package, args.name, args.project,
-                   args.poems, args.original, args.icon)
+                   args.poems, args.original, args.icon,
+                   mode=args.mode, html=args.html)
     print(f"已生成工程: {out}")
-    print(f"  包名={args.package}  应用名={args.name}"
+    print(f"  包名={args.package}  应用名={args.name}  模式={args.mode}"
           + (f"  图标={args.icon}" if args.icon else "  图标=默认九爻卦画"))
     print("下一步: sanjiu-apk build --dir <out> --jdk <JDK17> --sdk <ANDROID_SDK>")
 
@@ -35,6 +36,10 @@ def main(argv=None):
     s.add_argument("--poems", default=None, help="经典语料 poems.json 路径（可选）")
     s.add_argument("--original", default=None, help="三元原创 original.json 路径（可选）")
     s.add_argument("--icon", default=None, help="自定义 App 图标图片路径（可选，自动生成 5 密度 mipmap）")
+    s.add_argument("--mode", default="poem", choices=["poem", "web"],
+                   help="工程模式：poem=三元诗词APK（默认），web=WebView加载HTML（认知引擎等）")
+    s.add_argument("--html", default=None,
+                   help="web 模式下页面 HTML 路径（可选，缺省用模板内置 index.html）")
     s.set_defaults(func=_cmd_scaffold)
 
     b = sub.add_parser("build", help="检测 JDK/SDK、生成签名并构建 APK")

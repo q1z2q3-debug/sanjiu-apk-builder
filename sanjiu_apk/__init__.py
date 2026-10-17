@@ -4,4 +4,4 @@ scaffold 从内置模板生成完整 Android 工程（三元诗卦引擎 + 图�
 build 自动检测 JDK17/SDK、生成签名 keystore、构建并校验产出签名 APK。
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
