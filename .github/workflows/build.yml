@@ -57,7 +57,8 @@ jobs:
           sanjiu-apk scaffold --out ./app-cog \
             --package com.sanjiu.cog --name "三元九维·认知引擎" \
             --project SanjiuCog --mode web \
-            --html examples/cognitive-engine/index.html
+            --html examples/cognitive-engine/index.html \
+            --icon examples/cognitive-engine/icon.png
 
       - name: Build cognitive-engine APK
         run: sanjiu-apk build --dir ./app-cog

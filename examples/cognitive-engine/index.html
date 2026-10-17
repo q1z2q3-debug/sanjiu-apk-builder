@@ -101,7 +101,7 @@
   </div>
 
   <div class="result" id="result"></div>
-  <div class="foot">sanjiu-core · 5域语义桥 · 深度卦典 · 19683 认知坐标</div>
+  <div class="foot" id="foot">sanjiu-core · 5域语义桥 · 深度卦典 · 19683 认知坐标 <span id="qstat"></span></div>
 </div>
 
 <script>
@@ -259,10 +259,24 @@ function vecHtml(v){
     h+='<div class="vcell '+(v[i]>0?"vp":v[i]<0?"vn":"")+'"><div class="vv">'+s+'</div>上</div>';}
   return h+"</div>";}
 
+/* 全量卦典（19683，按需从 quanji_cog.js 加载；APK/同目录可用） */
+var QUANJI=null;
+(function(){try{
+  var s=document.createElement("script");s.src="quanji_cog.js";
+  s.onload=function(){QUANJI=window.QUANJI||null;
+    var st=document.getElementById("qstat");
+    if(st)st.textContent="｜ 全量卦典 19683 已载入";};
+  s.onerror=function(){var st=document.getElementById("qstat");
+    if(st)st.textContent="｜ 卦典：精简 25 条（加载 quanji_cog.js 获全量）";};
+  (document.head||document.body).appendChild(s);
+}catch(e){}} )();
+
 function oracleHtml(idx){
+  if(QUANJI&&QUANJI[idx]){var q=QUANJI[idx];
+    return '<div class="om">'+q[0]+'</div><div class="oq">'+q[1]+'</div><div class="os">'+q[2]+'</div>';}
   var r=null;for(var i=0;i<REPR.length;i++)if(REPR[i].i===idx){r=REPR[i];break;}
   if(r)return '<div class="om">'+r.m+'</div><div class="oq">'+r.q+'</div><div class="os">'+r.s+'…</div>';
-  return '<div class="om">卦 #'+idx+'</div><div class="oq">（完整卦典见 sanjiu_quanji_human）</div>';}
+  return '<div class="om">卦 #'+idx+'</div><div class="oq">（卦典加载中，请确认 quanji_cog.js 与页面同目录）</div>';}
 
 function run(){
   var text=document.getElementById("q").value.trim();

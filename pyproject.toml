@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sanjiu-apk-builder"
-version = "0.2.0"
+version = "0.3.0"
 description = "一键生成三元九维诗词分类 APK 的开源脚手架 + 构建器"
 readme = "README.md"
 license = { text = "MIT" }

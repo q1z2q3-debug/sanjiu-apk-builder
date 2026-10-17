@@ -113,8 +113,15 @@ def scaffold(out, package="com.sanjiu.apk", app_name="三元九维诗词",
     assets = os.path.join(main, "assets")
     os.makedirs(assets, exist_ok=True)
     if mode == "web":
-        src = html or os.path.join(_TEMPLATES, "web/index.html")
-        shutil.copy(src, os.path.join(assets, "index.html"))
+        src_dir = os.path.dirname(os.path.abspath(html)) if html else \
+                  os.path.join(_TEMPLATES, "web")
+        if not os.path.isdir(src_dir):
+            raise SystemExit(f"web 模式需要 --html 指定页面文件，未找到目录: {src_dir}")
+        # 把页面所在目录全部资源拷入 assets（index.html 及同目录的 JS/JSON/图片等）
+        for fn in sorted(os.listdir(src_dir)):
+            s = os.path.join(src_dir, fn)
+            if os.path.isfile(s):
+                shutil.copy(s, os.path.join(assets, fn))
     else:
         for name in ("poems.json", "original.json"):
             src = poems if (name == "poems.json" and poems) else \
