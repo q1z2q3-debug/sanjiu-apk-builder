@@ -47,15 +47,30 @@ jobs:
       - name: Build release APK
         run: sanjiu-apk build --dir ./app-demo
 
+      - name: Scaffold cognitive-engine web APK
+        run: |
+          sanjiu-apk scaffold --out ./app-cog \
+            --package com.sanjiu.cog --name "三元九维·认知引擎" \
+            --project SanjiuCog --mode web \
+            --html examples/cognitive-engine/index.html \
+            --icon examples/cognitive-engine/icon.png
+
+      - name: Build cognitive-engine APK
+        run: sanjiu-apk build --dir ./app-cog
+
       - name: Create GitHub Release with APK artifact
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
           APK=app-demo/app/build/outputs/apk/release/app-release.apk
+          COG=app-cog/app/build/outputs/apk/release/app-release.apk
           echo "== Release tag: $TAG =="
           gh release create "$TAG" \
-            "$APK" \
+            "$APK" "$COG" \
             --title "Release $TAG" \
-            --notes "由 [sanjiu-apk-builder](https://github.com/q1z2q3-debug/sanjiu-apk-builder) 自动构建的三元九维诗词 APK（release 签名，apksigner 校验通过）。" \
+            --notes "由 [sanjiu-apk-builder](https://github.com/q1z2q3-debug/sanjiu-apk-builder) 自动构建：
+- 三元九维诗词 APK（release 签名）
+- 三元九维·认知引擎 APK（全量卦典 19683 + 自定义图标，release 签名）
+均经 apksigner 校验。" \
             || gh release create "$TAG" --title "Release $TAG" --notes "Release $TAG"
